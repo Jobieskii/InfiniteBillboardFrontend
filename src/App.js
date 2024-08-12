@@ -11,8 +11,32 @@ import { FileUpload } from './components/fileUpload';
 
 function App() {
   const [file, setFile] = useState();
+  const [objectUrl, setObjectUrl] = useState();
+  const [finalScale, setFinalScale] = useState();
+  const [finalOffset, setFinalOffset] = useState();
+
   function handleChange(e) {
-      setFile(URL.createObjectURL(e.target.files[0]));
+    setObjectUrl(URL.createObjectURL(e.target.files[0]))
+    setFile(e.target.files[0]);
+  }
+  function handleUpload(e) {
+    if (file) {
+      var data = new FormData();
+      data.append('image', file);
+      data.append('scale', finalScale);
+      fetch(`http://localhost:8080/tiles/${Math.floor(finalOffset.x)}/${Math.floor(finalOffset.y)}`,
+        {
+          method: 'PATCH',
+          body: data,
+          headers: {
+            'Access-Control-Allow-Origin':'*',
+            'Accept': '*/*',
+          }
+
+        }
+      ).then(console.log)
+    }
+
   }
 
   return (
@@ -20,30 +44,30 @@ function App() {
       <header className="App-header scroll-align">
       </header>
       <div className='scroll-align'>
-      
-      <MapContainer 
-      center={[0, 0]} 
-      zoom={2} 
-      scrollWheelZoom={false} 
-      style={{position:'absolute', height:'100vh', width:'100vw'}} 
-      crs={CRS.Simple}
-      >
-        <TileLayer
-          id='tilelayer'
-          tileSize={512}
-          maxZoom={4} 
-          minZoom={1}
-          maxNativeZoom={3}
-          minNativeZoom={1}
-          zoomOffset={0}
-          zoomReverse={true}
-          url="http://localhost:8000/{z}/{x}/{y}.png"
-        />
-        <Overlay file={file}></Overlay>
-        <Logmap></Logmap>
-      </MapContainer>
-      
-      <FileUpload onChange={handleChange}></FileUpload>
+
+        <MapContainer
+          center={[0, 0]}
+          zoom={2}
+          scrollWheelZoom={false}
+          style={{ position: 'absolute', height: '100vh', width: '100vw' }}
+          crs={CRS.Simple}
+        >
+          <TileLayer
+            id='tilelayer'
+            tileSize={512}
+            maxZoom={4}
+            minZoom={1}
+            maxNativeZoom={3}
+            minNativeZoom={1}
+            zoomOffset={0}
+            zoomReverse={true}
+            url="http://localhost:8000/{z}/{x}/{y}.png"
+          />
+          <Overlay file={objectUrl} setFinalScale={setFinalScale} setFinalOffset={setFinalOffset}></Overlay>
+          <Logmap></Logmap>
+        </MapContainer>
+
+        <FileUpload onChange={handleChange} file={objectUrl} onUpload={handleUpload} uploadActive={true}></FileUpload>
       </div>
 
     </div>

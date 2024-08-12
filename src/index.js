@@ -11,7 +11,7 @@ root.render(
   </React.StrictMode>
 );
 window.addEventListener('paste', e => {
-  const upload = document.getElementById("fileupload");
+  const upload = document.getElementById("fileUpload");
   console.log(e.clipboardData.files);
   upload.files = e.clipboardData.files;
   upload.dispatchEvent(new Event("change", {bubbles: true}))
