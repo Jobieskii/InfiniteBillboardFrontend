@@ -6,12 +6,27 @@ export function Overlay({ file }) {
     const [yOffset, setYOffset] = useState();
     const [clientRect, setClientRect] = useState();
     const [scale, setScale] = useState();
+    const [zoomMultiplier, setZoomMultiplier] = useState();
 
     const map = useMapEvents({
+        load: (e) => {
+            console.log(e);
+            if (clientRect) {
+                calculateAnchor(clientRect, map, map.getZoom(), setXOffset, setYOffset);
+            }
+            const trueZoom = 3;
+            const newZoomMultiplier = Math.pow(2, trueZoom - map.getZoom());
+            setZoomMultiplier(newZoomMultiplier);
+        },
         move: (e) => {
             if (clientRect) {
                 calculateAnchor(clientRect, map, map.getZoom(), setXOffset, setYOffset);
             }
+        },
+        zoom: (e) => {
+            const trueZoom = 3;
+            const newZoomMultiplier = Math.pow(2, trueZoom - map.getZoom());
+            setZoomMultiplier(newZoomMultiplier);
         }
     });
 
@@ -19,12 +34,23 @@ export function Overlay({ file }) {
         console.log(e.target.width, e.target.height, e.target.offsetLeft);
         calculateAnchor(e.target.getBoundingClientRect(), map, map.getZoom(), setXOffset, setYOffset);
         setClientRect(e.target.getBoundingClientRect());
+
+        const trueZoom = 3;
+        const newZoomMultiplier = Math.pow(2, trueZoom - map.getZoom());
+        setZoomMultiplier(newZoomMultiplier);
+        
+        const maxDim = Math.max(e.target.width, e.target.height);
+        if (maxDim > 1024) {
+            setScale(512/(zoomMultiplier, maxDim));
+        } else {
+            setScale(1);
+        }
+        console.log(scale, zoomMultiplier);
     }
     
     if (file) {
-        console.log(file);
         return <div className="overlay">
-        <p><span>anchor: {Math.floor(xOffset)}px, {Math.floor(yOffset)}px</span><span style={{float:'right'}}>scale: {scale}</span></p>
+        <p><span>anchor: {Math.floor(xOffset)}px, {Math.floor(yOffset)}px</span><span style={{float:'right'}}>scale: {scale * zoomMultiplier}</span></p>
         <img id="overlayimg" src={file} className="overlay-image" onLoad={imglog}></img>
     </div>
     } else {
