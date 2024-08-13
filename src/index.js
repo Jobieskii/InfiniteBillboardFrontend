@@ -5,9 +5,17 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+
+var center = [0, 0];
+if (window.location.pathname.match(/\/-?\d+,-?\d+\/?/)) {
+  const locations = window.location.pathname.split('/')[1].split(',');
+  center[0] = parseInt(locations[0]);
+  center[1] = parseInt(locations[1]);
+}
+
 root.render(
   <React.StrictMode>
-    <App />
+    <App center={center}  />
   </React.StrictMode>
 );
 window.addEventListener('paste', e => {

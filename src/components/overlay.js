@@ -33,7 +33,6 @@ export function Overlay({ file, setFinalScale, setFinalOffset }) {
     });
 
     const imglog = (e) => {
-        console.log(e.target.width, e.target.height, e.target.offsetLeft);
         setImageSize({width: e.target.width, height: e.target.height});
         calculateAnchor(e.target.getBoundingClientRect(), map, map.getZoom(), setXOffset, setYOffset, setFinalOffset);
         setClientRect(e.target.getBoundingClientRect());

@@ -6,10 +6,11 @@ import { MapContainer } from 'react-leaflet/MapContainer'
 import { TileLayer } from 'react-leaflet/TileLayer'
 import { CRS } from 'leaflet';
 import { useMap } from 'react-leaflet/hooks'
+import { Point } from 'leaflet';
 import { useMapEvents } from 'react-leaflet/hooks';
 import { FileUpload } from './components/fileUpload';
 
-function App() {
+function App({ center }) {
   const [file, setFile] = useState();
   const [objectUrl, setObjectUrl] = useState();
   const [finalScale, setFinalScale] = useState();
@@ -41,9 +42,7 @@ function App() {
 
   return (
     <div className="App">
-      <header className="App-header scroll-align">
-      </header>
-      <div className='scroll-align'>
+
 
         <MapContainer
           center={[0, 0]}
@@ -64,26 +63,45 @@ function App() {
             url="http://localhost:8000/{z}/{x}/{y}.png"
           />
           <Overlay file={objectUrl} setFinalScale={setFinalScale} setFinalOffset={setFinalOffset}></Overlay>
-          <Logmap></Logmap>
+          <Logmap center={center} ></Logmap>
         </MapContainer>
 
         <FileUpload onChange={handleChange} file={objectUrl} onUpload={handleUpload} uploadActive={true}></FileUpload>
       </div>
 
-    </div>
   );
 }
 
-function Logmap() {
-  const map = useMap();
-  console.log(map.getCenter(), map.getPixelOrigin());
+function Logmap({ center }) {
+  const [stateObj, setStateObj] = useState();
+  const [firstLoad, setFirstLoad] = useState();
   const mapEvents = useMapEvents({
-    click: (e) => {
+    moveend: (e) => {
       const trueZoom = 3;
       const zoomMultiplier = Math.pow(2, trueZoom - mapEvents.getZoom());
-      // console.log(e.layerPoint.add(mapEvents.getPixelOrigin()).multiplyBy(zoomMultiplier))
+      const mapCenter = mapEvents.latLngToLayerPoint(mapEvents.getCenter())
+        .add(mapEvents.getPixelOrigin())
+        .multiplyBy(zoomMultiplier);
+      if (stateObj) {
+        const state = {state: "objected"};
+        window.history.pushState(state, '', `${window.location.origin}/${mapCenter.x},${mapCenter.y}`);  
+        console.log(window.history.state);
+        setStateObj(state);
+        
+      } else {
+        window.history.replaceState(stateObj, '', `${window.location.origin}/${mapCenter.x},${mapCenter.y}`);
+        console.log(window.history.state);
+      }
+      
     }
   })
+  if (!firstLoad) {
+    const trueZoom = 3;
+    const zoomMultiplier = Math.pow(2, trueZoom - mapEvents.getZoom());
+    // console.log(center, new Point(center.x, center.y).subtract(mapEvents.getPixelOrigin()));
+    mapEvents.flyTo(mapEvents.layerPointToLatLng(new Point(center[0], center[1]).divideBy(zoomMultiplier).subtract(mapEvents.getPixelOrigin())));
+    setFirstLoad(true);
+  }
   return null;
 }
 export default App;
