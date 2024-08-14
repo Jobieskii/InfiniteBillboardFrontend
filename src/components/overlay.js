@@ -1,47 +1,63 @@
-import { useState } from 'react';
+import { useCallback, useState, useEffect, useRef } from 'react';
 import { getZoomMultiplier } from '../helper/positioningData'
 
-export function Overlay({ imageObjectUrl, scale, onSetScale, onSetOffset, mapEvents }) {
+export function Overlay({ map, imageObjectUrl, imgSize, scale, onSetScale, onSetOffset, onSetImgSize }) {
     const [clientRect, setClientRect] = useState();
-    const [imgSize, setImageSize] = useState();
-    const [zoomMultiplier, setZoomMultiplier] = useState();
-    const [addedEvents, setAddedEvents] = useState(false);
+    const zoomMultiplier = getZoomMultiplier(map.getZoom());
+    const imageElement = useRef(null);
 
-    if (!addedEvents) {
-        mapEvents.addEventListener('move', (e) => {
-            if (clientRect) {
-                calculateAnchor(clientRect, map, map.getZoom(), onSetOffset);
-            }
-        });
-        mapEvents.addEventListener('zoom', (e) => {
-            const newZoomMultiplier = getZoomMultiplier(map.getZoom())
-            setZoomMultiplier(newZoomMultiplier);
-            onSetScale(scale * newZoomMultiplier);
-        });
-        mapEvents.addEventListener('load', (e) => {
-            console.log(e);
-            if (clientRect) {
-                calculateAnchor(clientRect, mapEvents, mapEvents.getZoom(), onSetOffset);
-            }
-            const newZoomMultiplier = getZoomMultiplier(mapEvents.getZoom())
-            setZoomMultiplier(newZoomMultiplier);
-        });
-        setAddedEvents(true);
+    const onMove = () => {
+        if (clientRect) {
+            calculateAnchor(clientRect, map, onSetOffset);
+        }
     }
-    const map = mapEvents;
+
+    const onResize = () => {
+        if (imageElement.current) {
+            const cr = imageElement.current.getBoundingClientRect();
+            setClientRect(cr);
+            calculateAnchor(cr, map, onSetOffset);
+        }
+    }
+    
+
+    useEffect(() => {
+        map.on('move', onMove);
+    
+        return () => {
+          map.off('move', onMove)
+    
+        }
+      }, [map, onMove]);
+
+    useEffect(() => {
+        window.addEventListener('resize', onResize);
+        return () => {
+            window.removeEventListener('resize', onResize);
+        }
+    }, [])
+
+    
+
+
 
     const imglog = (e) => {
-        setImageSize({ width: e.target.width, height: e.target.height });
-        calculateAnchor(e.target.getBoundingClientRect(), map, map.getZoom(), onSetOffset);
+        onSetImgSize({ width: e.target.naturalWidth, height: e.target.naturalHeight });
+        calculateAnchor(e.target.getBoundingClientRect(), map, onSetOffset);
         setClientRect(e.target.getBoundingClientRect());
 
-        const newZoomMultiplier = getZoomMultiplier(map.getZoom())
-        setZoomMultiplier(newZoomMultiplier);
+        var newScale = Math.min((window.innerWidth / 2) / e.target.naturalWidth, 1);
+        newScale = Math.min((window.innerHeight / 2) / e.target.naturalHeight, newScale);
+        console.log(newScale, zoomMultiplier);
+        onSetScale(newScale * zoomMultiplier);
+    }
+    const imgResize = (e) => {
+        calculateAnchor(e.target.getBoundingClientRect(), map, onSetOffset);
+        setClientRect(e.target.getBoundingClientRect());
+    }
 
-        var newScale = Math.min((window.innerWidth / 2) / e.target.width, 1);
-        newScale = Math.min((window.innerHeight / 2) / e.target.height, newScale);
-        console.log(newScale, newZoomMultiplier);
-        onSetScale(newScale * newZoomMultiplier);
+    if (!imageObjectUrl || !map) {
+        return null;
     }
 
     var style = {};
@@ -52,24 +68,24 @@ export function Overlay({ imageObjectUrl, scale, onSetScale, onSetOffset, mapEve
     } else if (scale * zoomMultiplier == 1) {
         style = { border: '4px solid green' }
     }
-    if (imgSize) {
-        style.width = imgSize.width * scale;
-    }
 
-    if (imageObjectUrl) {
-        return <div className="overlay">
-            <img id="overlayimg" src={imageObjectUrl} className="overlay-image" onLoad={imglog} style={style}></img>
-        </div>
-    } else {
-        return <div></div>
-    }
+    return <div className="overlay" style={style}>
+        <img
+            id="overlayimg"
+            src={imageObjectUrl}
+            className="overlay-image"
+            onLoad={imglog}
+            onTransitionEnd={imgResize}
+            ref={imageElement}
+            style={ imgSize ? { width: imgSize.width * scale } : {}}
+        ></img>
+    </div>
 
 }
 
-
-function calculateAnchor(boundingRect, map, zoom, setFinalOffset) {
+function calculateAnchor(boundingRect, map, setFinalOffset) {
     const b = boundingRect;
-    const zoomMultiplier = getZoomMultiplier(zoom)
+    const zoomMultiplier = getZoomMultiplier(map.getZoom());
     const p = map.containerPointToLayerPoint({ x: b.x, y: b.y }).add(map.getPixelOrigin()).multiplyBy(zoomMultiplier);
     setFinalOffset(p);
 }
