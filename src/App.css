@@ -1,6 +1,27 @@
 html {
   scroll-snap-type: y mandatory;
 }
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+input {
+  border: none;
+  background: none;
+  font-size: 1.3rem;
+}
+
+#fileUpload {
+  max-width: 30%;
+}
 
 .App-header {
   background-color: #282c34;
@@ -22,7 +43,7 @@ html {
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  z-index: 1020;
+  z-index: 1005;
   overflow: hidden;
   max-height: 100%;
   /* width: 50%; */
@@ -30,12 +51,16 @@ html {
   display: flex;
   flex-direction: column;
   align-items: stretch;
+  border-style: double;
+  animation: borderanim 0.5s ease-in-out 0s infinite alternate;
+}
+@keyframes borderanim {
+  from {border-width: 9px;}
+  to {border-width: 15px;}
 }
 .overlay-image {
   transform-origin: top;
-}
-.overlay p {
-  pointer-events: all;
+  transition: width 0.1s ease-in-out;
 }
 p {
   font-family: 'Courier New', Courier, monospace;
@@ -43,13 +68,116 @@ p {
   font-weight: bold;
   margin: 0;
 }
-.file-upload {
+.bottom-bar {
   position: absolute;
-  right: 0;
   bottom: 0;
+  width: 100%;
   z-index: 1010;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap-reverse;
+  flex-direction: row-reverse;
+  font-size: 1.3rem;
+  align-items: end;
+}
+.pos-control {
+  background: #fffa;
+  padding: 0 1rem;
+  text-align: center;
+  border-radius: 0.5rem 0.5rem 0 0;
+}
+.file-upload {
+  display: flex;
+  justify-content: end;
+  flex-grow: 1;
+  flex-wrap: wrap;
+}
+.file-button {
+  padding: 0.5rem 1rem;
+  border: 2px outset gray;
+  border-radius: 0.5rem;
+  background-color: #fffa;
+  margin: 0.5rem 0.5rem;
+  position: relative;
+  cursor: pointer;
+  box-shadow: 5px 5px 0px -1px var(--color);
+  transform: translate(-5px, -5px);
+  transition: all 0.1s ease-out;
+}
+.file-button:disabled:hover {
+  background-color: #fffa;
+}
+.file-button:hover {
+  background-color: #fffd;
+}
+.file-button:active {
+  box-shadow: none;
+  transform: none;
+}
+.file-button:disabled:active {
+  box-shadow: 4px 4px 0px -1px var(--color);
+  transform: translate(-4px, -4px);
+}
+.icon {
+  width: 32px;
+  height: 32px;
+  display: inline-block;
+  mask: var(--maskurl);
+  mask-size: cover;
+  background: #04003b;
+}
+.cancel-button .icon {
+  width: 24px;
+  height: 24px;
+}
+#uploadButton:not(:disabled)::before {
+  width: 0;
+  display: inline-block;
+  position: absolute;
+  left: 0;
+  content: "Merge!";
+  opacity: 0;
+  transition: all 0.3s ease-out;
+  font-size: medium;
+  
+}
+#uploadButton:not(:disabled):hover::before {
+  left: -100%;
+  opacity: 1;
 }
 
+.alert {
+  align-self: center;
+  position: relative;
+  border-radius: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  margin-right: 0.25rem;
+  max-width: calc(100vw - 64px);
+}
+.alert.warning {
+  background: rgba(255, 206, 58, 0.67);
+}
+.alert::before {
+  position: absolute;
+  display: block;
+  left: -42px;
+  top: 0px;
+  content: "";
+  /* background: rgba(255, 206, 58, 0.67); */
+  background-size: 36px 36px;
+  /* mask-size: cover; */
+  width: 36px;
+  height: 36px;
+}
+.alert.warning::before {
+  background-image: url(../public/iconset/notify-warn-c.svg);
+}
+.alert.error {
+  background: rgba(249, 67, 67, 0.67);
+}
+.alert.error::before {
+  background-image: url(../public/iconset/notify-emergency-c.svg);
+}
 .App-link {
   color: #61dafb;
 }

@@ -20,9 +20,13 @@ function App({ center }) {
   const [map, setMap] = useState(null)
 
   function handleFileChange(e) {
-    setObjectUrl(URL.createObjectURL(e.target.files[0]))
-    setFile(e.target.files[0]);
-
+    if (e.target.files && e.target.files[0]) {
+      setObjectUrl(URL.createObjectURL(e.target.files[0]))
+      setFile(e.target.files[0]);  
+    } else {
+      setObjectUrl(null);
+      setFile(null);
+    }
   }
 
 

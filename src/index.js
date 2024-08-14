@@ -23,9 +23,18 @@ window.addEventListener('paste', e => {
   console.log(e.clipboardData.files);
   upload.files = e.clipboardData.files;
   upload.dispatchEvent(new Event("change", {bubbles: true}))
-  console.log(e.clipboardData.files);
 });
-
+document.body.addEventListener('dragover', e => {
+  e.preventDefault();
+})
+document.body.addEventListener('drop', e => {
+  e.preventDefault();
+  e.stopPropagation();
+  const upload = document.getElementById("fileUpload");
+  console.log(e.dataTransfer.files);
+  upload.files = e.dataTransfer.files;
+  upload.dispatchEvent(new Event("change", {bubbles: true}))
+})
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals

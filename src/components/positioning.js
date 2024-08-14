@@ -8,15 +8,17 @@ export function PlacementBar({ x, y, scale, zoomMultiplier, onSetScale }) {
         console.log((scale * zoomMultiplier).toFixed(3));
         setDisplayScale((scale * zoomMultiplier).toFixed(3));
     }
-    return <p>
-    <span>
-        pos:
+    return <div style={{display: 'flex',
+        justifyContent: 'space-around',
+        flexGrow: '1'}}>
+    <span className='pos-control'>
+        x:
         <span>{Math.floor(x)}</span>
-        px,
+        &nbsp;y:
         <span>{Math.floor(y)}</span>
-        px
+        
     </span>
-    <span style={{ float: 'right' }}>
+    <span className='pos-control'>
         scale:
         <input 
         type="number" 
@@ -39,5 +41,5 @@ export function PlacementBar({ x, y, scale, zoomMultiplier, onSetScale }) {
         }}
         />
     </span>
-</p>
+</div>
 }

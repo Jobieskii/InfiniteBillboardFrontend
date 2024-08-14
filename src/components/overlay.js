@@ -62,11 +62,13 @@ export function Overlay({ map, imageObjectUrl, imgSize, scale, onSetScale, onSet
 
     var style = {};
     if (imgSize && Math.max(imgSize.width, imgSize.height) * scale * zoomMultiplier > 1024) {
-        style = { border: '4px solid red' };
+        style = { borderColor: 'rgba(249, 67, 67, 0.67)' };
     } else if (scale * zoomMultiplier < 1) {
-        style = { border: '4px solid yellow' };
+        style = { borderColor: 'rgba(255, 206, 58, 0.67)' };
     } else if (scale * zoomMultiplier == 1) {
-        style = { border: '4px solid green' }
+        style = { borderColor: 'rgba(129, 227, 30, 0.67)' }
+    } else {
+        style = { borderColor: 'rgba(255, 206, 58, 0.67)' }
     }
 
     return <div className="overlay" style={style}>
