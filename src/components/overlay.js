@@ -1,82 +1,75 @@
-import { useMapEvents, useMap } from "react-leaflet";
 import { useState } from 'react';
+import { getZoomMultiplier } from '../helper/positioningData'
 
-export function Overlay({ file, setFinalScale, setFinalOffset }) {
-    const [xOffset, setXOffset] = useState();
-    const [yOffset, setYOffset] = useState();
+export function Overlay({ imageObjectUrl, scale, onSetScale, onSetOffset, mapEvents }) {
     const [clientRect, setClientRect] = useState();
     const [imgSize, setImageSize] = useState();
-    const [scale, setScale] = useState();
     const [zoomMultiplier, setZoomMultiplier] = useState();
+    const [addedEvents, setAddedEvents] = useState(false);
 
-    const map = useMapEvents({
-        load: (e) => {
+    if (!addedEvents) {
+        mapEvents.addEventListener('move', (e) => {
+            if (clientRect) {
+                calculateAnchor(clientRect, map, map.getZoom(), onSetOffset);
+            }
+        });
+        mapEvents.addEventListener('zoom', (e) => {
+            const newZoomMultiplier = getZoomMultiplier(map.getZoom())
+            setZoomMultiplier(newZoomMultiplier);
+            onSetScale(scale * newZoomMultiplier);
+        });
+        mapEvents.addEventListener('load', (e) => {
             console.log(e);
             if (clientRect) {
-                calculateAnchor(clientRect, map, map.getZoom(), setXOffset, setYOffset, setFinalOffset);
+                calculateAnchor(clientRect, mapEvents, mapEvents.getZoom(), onSetOffset);
             }
-            const trueZoom = 3;
-            const newZoomMultiplier = Math.pow(2, trueZoom - map.getZoom());
+            const newZoomMultiplier = getZoomMultiplier(mapEvents.getZoom())
             setZoomMultiplier(newZoomMultiplier);
-        },
-        move: (e) => {
-            if (clientRect) {
-                calculateAnchor(clientRect, map, map.getZoom(), setXOffset, setYOffset, setFinalOffset);
-            }
-        },
-        zoom: (e) => {
-            const trueZoom = 3;
-            const newZoomMultiplier = Math.pow(2, trueZoom - map.getZoom());
-            setZoomMultiplier(newZoomMultiplier);
-            setFinalScale(scale * newZoomMultiplier);
-        }
-    });
+        });
+        setAddedEvents(true);
+    }
+    const map = mapEvents;
 
     const imglog = (e) => {
-        setImageSize({width: e.target.width, height: e.target.height});
-        calculateAnchor(e.target.getBoundingClientRect(), map, map.getZoom(), setXOffset, setYOffset, setFinalOffset);
+        setImageSize({ width: e.target.width, height: e.target.height });
+        calculateAnchor(e.target.getBoundingClientRect(), map, map.getZoom(), onSetOffset);
         setClientRect(e.target.getBoundingClientRect());
 
-        const trueZoom = 3;
-        const newZoomMultiplier = Math.pow(2, trueZoom - map.getZoom());
+        const newZoomMultiplier = getZoomMultiplier(map.getZoom())
         setZoomMultiplier(newZoomMultiplier);
 
-        const maxDim = Math.max(e.target.width, e.target.height);
-        if (maxDim > 1024) {
-            setScale(512/(zoomMultiplier, maxDim));
-        } else {
-            setScale(1);
-        }
-        console.log(scale, zoomMultiplier);
-        setFinalScale(scale * zoomMultiplier);
-    }
-    
-    var style = {};
-    if (imgSize && Math.max(imgSize.width, imgSize.height) * scale * zoomMultiplier > 1024) {
-        style = {border: '4px solid red'};
-    } else if (scale * zoomMultiplier < 1) {
-        style = {border: '4px solid yellow'};
-    } else if (scale * zoomMultiplier == 1) {
-        style = {border: '4px solid green'}
+        var newScale = Math.min((window.innerWidth / 2) / e.target.width, 1);
+        newScale = Math.min((window.innerHeight / 2) / e.target.height, newScale);
+        console.log(newScale, newZoomMultiplier);
+        onSetScale(newScale * newZoomMultiplier);
     }
 
-    if (file) {
+    var style = {};
+    if (imgSize && Math.max(imgSize.width, imgSize.height) * scale * zoomMultiplier > 1024) {
+        style = { border: '4px solid red' };
+    } else if (scale * zoomMultiplier < 1) {
+        style = { border: '4px solid yellow' };
+    } else if (scale * zoomMultiplier == 1) {
+        style = { border: '4px solid green' }
+    }
+    if (imgSize) {
+        style.width = imgSize.width * scale;
+    }
+
+    if (imageObjectUrl) {
         return <div className="overlay">
-        <p><span>anchor: {Math.floor(xOffset)}px, {Math.floor(yOffset)}px</span><span style={{float:'right'}}>scale: {scale * zoomMultiplier}</span></p>
-        <img id="overlayimg" src={file} className="overlay-image" onLoad={imglog} style={style}></img>
-    </div>
+            <img id="overlayimg" src={imageObjectUrl} className="overlay-image" onLoad={imglog} style={style}></img>
+        </div>
     } else {
         return <div></div>
     }
-    
+
 }
 
-function calculateAnchor(boundingRect, map, zoom, setXOffset, setYOffset, setFinalOffset) {
+
+function calculateAnchor(boundingRect, map, zoom, setFinalOffset) {
     const b = boundingRect;
-    const trueZoom = 3;
-    const zoomMultiplier = Math.pow(2, trueZoom - zoom);
-    const p = map.containerPointToLayerPoint({x: b.x, y: b.y}).add(map.getPixelOrigin()).multiplyBy(zoomMultiplier);
-    setXOffset(p.x);
-    setYOffset(p.y);
+    const zoomMultiplier = getZoomMultiplier(zoom)
+    const p = map.containerPointToLayerPoint({ x: b.x, y: b.y }).add(map.getPixelOrigin()).multiplyBy(zoomMultiplier);
     setFinalOffset(p);
 }

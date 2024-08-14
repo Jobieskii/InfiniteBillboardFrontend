@@ -25,11 +25,14 @@ html {
   z-index: 1020;
   overflow: hidden;
   max-height: 100%;
-  max-width: 100%;
+  /* width: 50%; */
   pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
 }
 .overlay-image {
-
+  transform-origin: top;
 }
 .overlay p {
   pointer-events: all;
