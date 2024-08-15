@@ -36,7 +36,7 @@ function App({ center }) {
         center={[0, 0]}
         zoom={2}
         scrollWheelZoom={false}
-        style={{ position: 'absolute', height: '100vh', width: '100vw' }}
+        style={{ position: 'absolute', height: '100vh', width: '100vw', background:'white' }}
         crs={CRS.Simple}
         ref={setMap}>
         <TileLayer

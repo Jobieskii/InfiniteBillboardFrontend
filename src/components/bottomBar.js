@@ -26,10 +26,10 @@ export function BottomBar({ map, file, offset, scale, imgSize, onChange, onSetSc
     const zm = getZoomMultiplier(map.getZoom());
     var warning = null;
     var error = null;
-    if (imgSize.width * scale * zm > 1024 || imgSize.height * scale * zm > 1024) {
+    if (imgSize && (imgSize.width * scale * zm > 1024 || imgSize.height * scale * zm > 1024)) {
         error = "Image after scaling is too large (>1024px).";
     }
-    if (scale * zm < 1) {
+    if (!error && scale * zm < 1) {
         warning = "Image will be scaled down.";
     }
     return <div className="bottom-bar">

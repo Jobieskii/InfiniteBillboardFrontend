@@ -49,7 +49,7 @@ export function Overlay({ map, imageObjectUrl, imgSize, scale, onSetScale, onSet
         var newScale = Math.min((window.innerWidth / 2) / e.target.naturalWidth, 1);
         newScale = Math.min((window.innerHeight / 2) / e.target.naturalHeight, newScale);
         console.log(newScale, zoomMultiplier);
-        onSetScale(newScale * zoomMultiplier);
+        onSetScale(newScale);
     }
     const imgResize = (e) => {
         calculateAnchor(e.target.getBoundingClientRect(), map, onSetOffset);
