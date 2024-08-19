@@ -1,37 +1,63 @@
+import { useState } from 'react';
 import { getZoomMultiplier, resetUpload } from '../helper/positioningData';
 import { PlacementBar } from './positioning'
 
-export function BottomBar({ map, file, offset, scale, imgSize, onChange, onSetScale }) {
+export function BottomBar({ map, file, offset, scale, imgSize, onChange, onSetScale, username }) {
+    const [timeouts, setTimeouts] = useState(5);
     if (!map) return null;
 
+    if (timeouts > 0) {
+        setTimeout(() => setTimeouts(timeouts - 1), 1000);
+    }
     function handleUpload() {
         if (map && file) {
             var data = new FormData();
             data.append('image', file);
             data.append('scale', getZoomMultiplier(map.getZoom()) * scale);
-            fetch(`http://localhost:8080/tiles/${Math.floor(offset.x)}/${Math.floor(offset.y)}`,
+            fetch(`https://api.bib.localhost.com/tiles/${Math.floor(offset.x)}/${Math.floor(offset.y)}`,
                 {
                     method: 'PATCH',
                     body: data,
+                    credentials: 'include',
                     headers: {
-                        'Access-Control-Allow-Origin': '*',
                         'Accept': '*/*',
-                    }
-
+                    },
                 }
-            ).then(console.log)
+            ).then(e => {
+                if (e.ok) {
+                    resetUpload();
+                    setTimeouts(5);
+                } else if (e.status === 429) {
+                    alert("Too many requests: wait for cooldown to run out!");
+                } else if (e.status == 423) {
+                    alert("This region is protected!")
+                    setTimeouts(5);
+                } else if (e.status === 400) {
+                    alert("File too large");
+                    setTimeouts(5);
+                }
+            })
         }
     }
     
     const zm = getZoomMultiplier(map.getZoom());
     var warning = null;
     var error = null;
-    if (imgSize && (imgSize.width * scale * zm > 1024 || imgSize.height * scale * zm > 1024)) {
+    if (timeouts > 0) {
+        error = `Please wait ${timeouts}s.`;
+    } else if (imgSize && (imgSize.width * scale * zm > 1024 || imgSize.height * scale * zm > 1024)) {
         error = "Image after scaling is too large (>1024px).";
     }
-    if (!error && scale * zm < 1) {
+    else if (scale * zm < 1) {
         warning = "Image will be scaled down.";
     }
+
+    if (!username) {
+        return <div className="bottom-bar">
+            <a href='https://localhost.com'>login with Bohenek</a>
+        </div>
+    }
+
     return <div className="bottom-bar">
         <div className="file-upload">
             {file ?
