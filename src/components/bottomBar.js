@@ -14,7 +14,7 @@ export function BottomBar({ map, file, offset, scale, imgSize, onChange, onSetSc
             var data = new FormData();
             data.append('image', file);
             data.append('scale', getZoomMultiplier(map.getZoom()) * scale);
-            fetch(`https://api.bib.localhost.com/tiles/${Math.floor(offset.x)}/${Math.floor(offset.y)}`,
+            fetch(`https://bib.bohenek.xyz/api/tiles/${Math.floor(offset.x)}/${Math.floor(offset.y)}`,
                 {
                     method: 'PATCH',
                     body: data,
@@ -54,7 +54,7 @@ export function BottomBar({ map, file, offset, scale, imgSize, onChange, onSetSc
 
     if (!username) {
         return <div className="bottom-bar">
-            <a href='https://localhost.com'>login with Bohenek</a>
+            <a href='https://bohenek.xyz'>login with Bohenek</a>
         </div>
     }
 
@@ -62,9 +62,9 @@ export function BottomBar({ map, file, offset, scale, imgSize, onChange, onSetSc
         <div className="file-upload">
             {file ?
                 <><span className='alert warning' hidden={!warning}>{warning}</span><span className='alert error' hidden={!error}>{error}</span>
-                <span><button id="uploadButton" onClick={_ => handleUpload()} disabled={!!error} className='file-button confirm-button' style={{'--color': '#2f9700'}} ><span className='icon' style={{'--maskurl': 'url(iconset/layer-action-mergedown.svg)'}}></span></button>
-                    <button id="cancelUploadButton" onClick={resetUpload} className='file-button cancel-button' style={{'--color': '#cb4949'}}><span className='icon' style={{'--maskurl': 'url(iconset/act-remove.svg)'}}></span></button></span></> : 
-                    <button onClick={() => document.getElementById("fileUpload").click()} className='file-button' style={{'--color': '#2f9700'}} ><span className='icon' style={{'--maskurl': 'url(iconset/hardware-imagescanner.svg)'}}></span></button>}
+                <span><button id="uploadButton" onClick={_ => handleUpload()} disabled={!!error} className='file-button confirm-button' style={{'--color': '#2f9700'}} ><span className='icon action-mergedown'></span></button>
+                    <button id="cancelUploadButton" onClick={resetUpload} className='file-button cancel-button' style={{'--color': '#cb4949'}}><span className='icon act-remove'></span></button></span></> : 
+                    <button onClick={() => document.getElementById("fileUpload").click()} className='file-button' style={{'--color': '#2f9700'}} ><span className='icon imagescanner'></span></button>}
 
             <input id="fileUpload" type="file" onChange={onChange} hidden />
         </div>

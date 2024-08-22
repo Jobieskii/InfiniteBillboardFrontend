@@ -63,13 +63,14 @@ function App({ center }) {
           id='tilelayer'
           tileSize={512}
           maxZoom={5}
+          // minZoom={1}
           minZoom={Browser.retina ? 0 : 1}
           maxNativeZoom={Browser.retina ? 3 : 4} //Retina adds + 1 here
           // maxNativeZoom={4}
           minNativeZoom={1}
           zoomOffset={0}
           zoomReverse={true}
-          url="https://api.bib.localhost.com/content/{z}/{x}/{y}.png?{buster}"
+          url="https://bib.bohenek.xyz/content/{z}/{x}/{y}.png?{buster}"
           buster={cacheBustIndex}
           detectRetina={true}
         />
@@ -81,7 +82,7 @@ function App({ center }) {
   )
   useEffect(() => {
     const stompClient = new Client({
-      brokerURL: "wss://api.bib.localhost.com/updates",
+      brokerURL: "wss://bib.bohenek.xyz/api/stomp",
       onConnect: (frame) => {
         console.log("connected to stomp", frame);
         stompClient.subscribe('/topic/tile-updates', function(messageOutput) {
@@ -97,7 +98,7 @@ function App({ center }) {
     });
     stompClient.activate();
     
-    fetch("https://api.bib.localhost.com/session", {credentials: "include"})
+    fetch("https://bib.bohenek.xyz/api/session", {credentials: "include"})
       .then( e => e.json())
       .then( e => setUsername(e.username))
       .catch(e=>e);
@@ -143,13 +144,16 @@ function Logmap({ center }) {
       mapCenter.y = Math.floor(mapCenter.y);
       if (!stateObj) {
         const state = { state: "objected" };
-        window.history.pushState(state, '', `${window.location.origin}/${mapCenter.x},${mapCenter.y}`);
+        window.history.pushState(state, '', `${window.location.origin}/#${mapCenter.x},${mapCenter.y}`);
         setStateObj(state);
 
       } else {
-        window.history.replaceState(stateObj, '', `${window.location.origin}/${mapCenter.x},${mapCenter.y}`);
+        window.history.replaceState(stateObj, '', `${window.location.origin}/#${mapCenter.x},${mapCenter.y}`);
       }
 
+    },
+    zoomend: (e) => {
+      console.log(mapEvents.getZoom(), getZoomMultiplier(mapEvents.getZoom()), Browser.retina )
     }
   })
 

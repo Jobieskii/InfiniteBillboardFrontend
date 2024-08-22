@@ -7,8 +7,8 @@ import reportWebVitals from './reportWebVitals';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 var center = [0, 0];
-if (window.location.pathname.match(/\/-?\d+,-?\d+\/?/)) {
-  const locations = window.location.pathname.split('/')[1].split(',');
+if (window.location.href.match(/\/\#-?\d+,-?\d+\/?/)) {
+  const locations = window.location.href.split('#')[1].split(',');
   center[0] = Math.min(Math.max(parseInt(locations[0]), -500000), 500000);
   center[1] = Math.min(Math.max(parseInt(locations[1]), -500000), 500000);
 }

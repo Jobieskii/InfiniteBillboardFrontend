@@ -170,16 +170,25 @@ p {
   height: 36px;
 }
 .alert.warning::before {
-  background-image: url(../public/iconset/notify-warn-c.svg);
+  background-image: url(iconset/notify-warn-c.svg);
 }
 .alert.error {
   background: rgba(249, 67, 67, 0.67);
 }
 .alert.error::before {
-  background-image: url(../public/iconset/notify-emergency-c.svg);
+  background-image: url(iconset/notify-emergency-c.svg);
 }
 .App-link {
   color: #61dafb;
+}
+.action-mergedown {
+  --maskurl: url(iconset/layer-action-mergedown.svg);
+}
+.act-remove {
+  --maskurl: url(iconset/act-remove.svg)
+}
+.imagescanner {
+  --maskurl: url(iconset/hardware-imagescanner.svg)
 }
 
 @keyframes App-logo-spin {

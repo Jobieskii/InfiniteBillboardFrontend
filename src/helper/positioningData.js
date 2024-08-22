@@ -5,7 +5,7 @@ export function newPositioningData(point, scale) {
 }
 
 export function getZoomMultiplier(zoom) {
-    const trueZoom = 3;
+    const trueZoom = 4;
     return Math.pow(2, trueZoom - zoom);
 }
 
