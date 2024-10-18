@@ -9,12 +9,12 @@ export function PlacementBar({ x, y, scale, zoomMultiplier, onSetScale }) {
 
     useEffect(() => {
         localStorage.setItem('scale', keepScale);
-        if (!!keepScale && scale != keepScale) {
-            onSetScale(keepScale);
+        if (!!keepScale && scale !== keepScale / zoomMultiplier) {
+            onSetScale(keepScale / zoomMultiplier);
         }
-    }, [keepScale, scale])
+    }, [keepScale, scale, zoomMultiplier, onSetScale])
 
-    if (!editingScale && (scale * zoomMultiplier).toFixed(3) != displayScale) {
+    if (!editingScale && (scale * zoomMultiplier).toFixed(3) !== displayScale) {
         console.log((scale * zoomMultiplier).toFixed(3), scale);
         setDisplayScale((scale * zoomMultiplier).toFixed(3));
     }
@@ -52,7 +52,7 @@ export function PlacementBar({ x, y, scale, zoomMultiplier, onSetScale }) {
             />
             <span className={`icon ${!keepScale ? 'lock-off' : 'lock-on'}`}
                 style={{ width: '1.5rem', height: '1.5rem', cursor: 'pointer' }}
-                onClick={() => !keepScale ? setKeepScale(scale) : setKeepScale(NaN)}
+                onClick={() => !keepScale ? setKeepScale(scale * zoomMultiplier) : setKeepScale(NaN)}
             ></span>
         </span>
     </div>
