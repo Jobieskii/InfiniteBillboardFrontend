@@ -51,7 +51,7 @@ export function PlacementBar({ x, y, scale, zoomMultiplier, onSetScale }) {
                 }}
             />
             <span className={`icon ${!keepScale ? 'lock-off' : 'lock-on'}`}
-                style={{ width: '1.5rem', height: '1.5rem' }}
+                style={{ width: '1.5rem', height: '1.5rem', cursor: 'pointer' }}
                 onClick={() => !keepScale ? setKeepScale(scale) : setKeepScale(NaN)}
             ></span>
         </span>
