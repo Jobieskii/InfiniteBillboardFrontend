@@ -199,3 +199,22 @@ p {
     transform: rotate(360deg);
   }
 }
+
+.leaflet-tile-container {
+  perspective: 80vw;
+}
+
+.bib-leaflet-tile {
+  backface-visibility: hidden;
+  scale: 0.25;
+  rotate: y 180deg;
+}
+
+.bib-leaflet-tile--animated {
+  transition: rotate 1.5s cubic-bezier(0.33, 1, 0.68, 1),
+  scale 1.5s cubic-bezier(0.33, 1, 0.68, 1);
+  transform-style: preserve-3d;
+
+  scale: 1;
+  rotate: y 0deg;
+}

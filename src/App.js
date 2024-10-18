@@ -155,7 +155,39 @@ function Logmap({ center }) {
     zoomend: (e) => {
       console.log(mapEvents.getZoom(), getZoomMultiplier(mapEvents.getZoom()), Browser.retina )
     }
-  })
+  });
+  
+  useEffect(() => {
+    mapEvents.eachLayer((layer) => {
+      const onTileLoad = function (event) {
+        const tile = event.tile;
+
+        // remove the transform from leaflet and add class to flip the tiles
+        tile.style.transform = "";
+        tile.classList.add("bib-leaflet-tile");
+
+        // after a random interval add the aninmation
+        setTimeout(() => {
+          tile.classList.add("bib-leaflet-tile--animated");
+        }, Math.random() * 1500 + 100);
+
+        // put back the translate as a indivual property instead of using transform
+        tile.style.translate = `${tile._leaflet_pos.x}px ${tile._leaflet_pos.y}px`;
+
+      };
+
+      layer.on("tileload", onTileLoad);
+
+      // when the page has fully loaded remove the animation listener
+      layer.on("load", function (event) {
+        layer.off("tileload", onTileLoad);
+      });
+
+      return () => {
+        layer.off("tileload");
+      };
+    });
+  }, [mapEvents]);
 
   if (!firstLoad) {
     const zoomMultiplier = getZoomMultiplier(mapEvents.getZoom());
