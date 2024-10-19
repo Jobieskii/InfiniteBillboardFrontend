@@ -1,6 +1,3 @@
-html {
-  scroll-snap-type: y mandatory;
-}
 /* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
@@ -33,11 +30,6 @@ input {
   color: white;
 }
 
-.scroll-align {
-  scroll-snap-align: start;
-  height: 100vh;
-  position: relative;
-}
 .overlay {
   position: absolute;
   left: 50%;
@@ -63,9 +55,7 @@ input {
   transition: width 0.1s ease-in-out;
 }
 p {
-  font-family: 'Courier New', Courier, monospace;
   font-size: large;
-  font-weight: bold;
   margin: 0;
 }
 .bottom-bar {
@@ -190,12 +180,25 @@ p {
 .imagescanner {
   --maskurl: url(iconset/hardware-imagescanner.svg)
 }
+.spinnerffs {
+  padding-right: 3rem;
+}
+.spinnerffs::after {
+  animation: dot-dot-dot 1s linear 0s infinite;
+  position: absolute;
+}
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+@keyframes dot-dot-dot {
+  0% {
+    content: ".";
   }
-  to {
-    transform: rotate(360deg);
+  33% {
+    content: "..";
+  }
+  66% {
+    content: "...";
+  }
+  100% {
+    content: ".";
   }
 }

@@ -53,8 +53,8 @@ function App({ center }) {
       <MapContainer
         center={[0, 0]}
         zoom={3}
-        scrollWheelZoom={false}
-        style={{ position: 'absolute', height: '100vh', width: '100vw', background:'white' }}
+        scrollWheelZoom={true}
+        style={{ position: 'absolute', height: '100dvh', width: '100dvw', background: 'white' }}
         crs={CRS.Simple}
         ref={setMap}
         attributionControl={false}
@@ -98,11 +98,16 @@ function App({ center }) {
     });
     stompClient.activate();
     
-    fetch("https://bib.bohenek.xyz/api/session", {credentials: "include"})
-      .then( e => e.json())
-      .then( e => setUsername(e.username))
-      .catch(e=>e);
-    
+    fetch("https://bib.bohenek.xyz/api/session", { credentials: "include" })
+      .then(e => {
+        
+        if (e.ok) {
+          e.json().then(e => setUsername(e.username));
+        } else {
+          setUsername("");
+        }
+      })
+      .catch(e => e);
     return () => stompClient.deactivate();
   }, [map])
 

@@ -52,10 +52,12 @@ export function BottomBar({ map, file, offset, scale, imgSize, onChange, onSetSc
         warning = "Image will be scaled down.";
     }
 
-    if (!username) {
+    if (username === "") {
         return <div className="bottom-bar">
             <a href='https://bohenek.xyz'>login with Bohenek</a>
         </div>
+    } else if (username === null) {
+        return <div className="bottom-bar"><p className='spinnerffs'>checking status</p></div>
     }
 
     return <div className="bottom-bar">
