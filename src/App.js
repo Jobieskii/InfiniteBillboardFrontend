@@ -163,7 +163,7 @@ function Logmap({ center }) {
         const tile = event.tile;
           // remove the transform from leaflet and add class to flip the tiles
           tile.style.transform = "";
-          tile.classList.add("bib-leaflet-tile");F
+          tile.classList.add("bib-leaflet-tile");
           if (tile.parentNode && !tile.parentNode.classList.contains("bib-tile-wrapper")) {
             const wrapper = document.createElement("div");
             wrapper.classList.add("bib-tile-wrapper");
@@ -185,6 +185,7 @@ function Logmap({ center }) {
               
               const parent = wrapper.parentNode;
               if(parent){
+                tile.classList.remove('bib-leaflet-tile');
               parent.insertBefore(tile, wrapper);
               parent.removeChild(wrapper);
               }

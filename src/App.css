@@ -204,29 +204,43 @@ p {
   perspective: 80vw;
 } */
 
-.bib-leaflet-tile {
-  backface-visibility: hidden;
-}
-
-.bib-leaflet-tile--flipped {
-  transform: rotateY(180deg);
-  backface-visibility: hidden;
-}
-
 .bib-tile-wrapper{
-  display: block;
   scale: 0.25;
-  rotate: y 180deg;
+  /* rotate: y 180deg; */
   width: 512px;
   opacity: 0;
   /* height: 32px; */
+
+  .bib-leaflet-tile {
+    transition: rotate 1.5s cubic-bezier(0.33, 1, 0.68, 1);
+    rotate: y 180deg;
+    backface-visibility: hidden;
+  }
+
+  .bib-leaflet-tile--flipped {
+    transition: rotate 1.5s cubic-bezier(0.33, 1, 0.68, 1);
+    rotate: y 0deg;
+    backface-visibility: hidden;
+  }
+
 }
 
 .bib-tile-wrapper--animated{
-  transition: rotate 1.5s cubic-bezier(0.33, 1, 0.68, 1),
+  transition: rotate 100.5s cubic-bezier(0.33, 1, 0.68, 1),
   scale 1.5s cubic-bezier(0.33, 1, 0.68, 1);
   transform-style: preserve-3d;
   opacity: 1;
   scale: 1;
-  rotate: y 0deg;
+
+  .bib-leaflet-tile{
+    rotate: y 0deg;
+  }
+  
+  .bib-leaflet-tile--flipped{
+    rotate: y 180deg;
+  }
+  
+
 }
+
+
