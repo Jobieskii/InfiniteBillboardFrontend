@@ -182,7 +182,8 @@ p {
   padding-right: 3rem;
 }
 .spinnerffs::after {
-  animation: dot-dot-dot 1s linear 0s infinite;
+  content: ".";
+  animation: dot-dot-dot 2s linear 0s infinite;
   position: absolute;
 }
 

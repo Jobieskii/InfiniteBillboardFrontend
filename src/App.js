@@ -1,6 +1,5 @@
-import logo from './logo.svg';
 import './App.css';
-import { getZoomMultiplier, newPositioningData, tileInView } from './helper/positioningData'
+import { getZoomMultiplier, tileInView } from './helper/positioningData'
 import { Overlay } from './components/overlay';
 import { useState, useMemo, useEffect } from 'react';
 import { MapContainer } from 'react-leaflet/MapContainer'
@@ -78,7 +77,7 @@ function App({ center }) {
         <Logmap center={center}></Logmap>
       </MapContainer>
     ),
-    [],
+    [center],
   )
   useEffect(() => {
     const stompClient = new Client({
