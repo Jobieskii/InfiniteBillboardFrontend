@@ -155,25 +155,46 @@ function Logmap({ center }) {
     zoomend: (e) => {
       console.log(mapEvents.getZoom(), getZoomMultiplier(mapEvents.getZoom()), Browser.retina )
     }
-  });
+  })
   
   useEffect(() => {
     mapEvents.eachLayer((layer) => {
       const onTileLoad = function (event) {
         const tile = event.tile;
+          // remove the transform from leaflet and add class to flip the tiles
+          tile.style.transform = "";
+          tile.classList.add("bib-leaflet-tile");F
+          if (tile.parentNode && !tile.parentNode.classList.contains("bib-tile-wrapper")) {
+            const wrapper = document.createElement("div");
+            wrapper.classList.add("bib-tile-wrapper");
+            tile.parentNode.insertBefore(wrapper, tile);
+            wrapper.appendChild(tile);
 
-        // remove the transform from leaflet and add class to flip the tiles
-        tile.style.transform = "";
-        tile.classList.add("bib-leaflet-tile");
+            const flippedTile = document.createElement("img");
+            flippedTile.classList = tile.classList;
+            flippedTile.classList.add("bib-leaflet-tile--flipped");
 
+            flippedTile.src = 'android-chrome-512x512.png';
+            wrapper.appendChild(flippedTile);
+  
+            // put back the translate as a indivual property instead of using transform
+            wrapper.style.translate = `${tile._leaflet_pos.x}px ${tile._leaflet_pos.y}px`;
+
+            wrapper.addEventListener('transitionend', (event) => {
+              tile.style.translate = wrapper.style.translate;
+              
+              const parent = wrapper.parentNode;
+              if(parent){
+              parent.insertBefore(tile, wrapper);
+              parent.removeChild(wrapper);
+              }
+            });
         // after a random interval add the aninmation
         setTimeout(() => {
-          tile.classList.add("bib-leaflet-tile--animated");
+          wrapper.classList.add("bib-tile-wrapper--animated");
+
         }, Math.random() * 1500 + 100);
-
-        // put back the translate as a indivual property instead of using transform
-        tile.style.translate = `${tile._leaflet_pos.x}px ${tile._leaflet_pos.y}px`;
-
+      }
       };
 
       layer.on("tileload", onTileLoad);
@@ -182,6 +203,7 @@ function Logmap({ center }) {
       layer.on("load", function (event) {
         layer.off("tileload", onTileLoad);
       });
+
 
       return () => {
         layer.off("tileload");
