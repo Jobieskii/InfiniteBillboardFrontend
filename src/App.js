@@ -98,7 +98,7 @@ function App({ center }) {
     });
     stompClient.activate();
     
-    fetch("https://bib.bohenek.xyz/api/session", {credentials: "include"})
+    fetch("https://bib.bohenek.xyz/api/session")
       .then( e => e.json())
       .then( e => setUsername(e.username))
       .catch(e=>e);
@@ -144,11 +144,11 @@ function Logmap({ center }) {
       mapCenter.y = Math.floor(mapCenter.y);
       if (!stateObj) {
         const state = { state: "objected" };
-        window.history.pushState(state, '', `${window.location.origin}/#${mapCenter.x},${mapCenter.y}`);
+        window.history.pushState(state, '', `${window.location.origin}/?${mapCenter.x},${mapCenter.y}`);
         setStateObj(state);
 
       } else {
-        window.history.replaceState(stateObj, '', `${window.location.origin}/#${mapCenter.x},${mapCenter.y}`);
+        window.history.replaceState(stateObj, '', `${window.location.origin}/?${mapCenter.x},${mapCenter.y}`);
       }
 
     },
