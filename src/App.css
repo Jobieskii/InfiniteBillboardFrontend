@@ -200,47 +200,35 @@ p {
   }
 }
 
-/* .leaflet-tile-container {
-  perspective: 80vw;
-} */
-
-.bib-tile-wrapper{
-  scale: 0.25;
-  /* rotate: y 180deg; */
-  width: 512px;
-  opacity: 0;
-  /* height: 32px; */
+.bib-tile-wrapper {
+  perspective: 300rem;
+  transform-style: preserve-3d;
+  
+  .bib-leaflet-tile, 
+  .bib-leaflet-tile--flipped {
+    width: calc(512px * var(--scaling)) !important;
+    backface-visibility: hidden;
+    transition: rotate 0.8s ease-in;
+  }
 
   .bib-leaflet-tile {
-    transition: rotate 1.5s cubic-bezier(0.33, 1, 0.68, 1);
     rotate: y 180deg;
-    backface-visibility: hidden;
   }
 
   .bib-leaflet-tile--flipped {
-    transition: rotate 1.5s cubic-bezier(0.33, 1, 0.68, 1);
     rotate: y 0deg;
-    backface-visibility: hidden;
+    visibility: visible;
   }
-
 }
 
-.bib-tile-wrapper--animated{
-  transition: rotate 100.5s cubic-bezier(0.33, 1, 0.68, 1),
-  scale 1.5s cubic-bezier(0.33, 1, 0.68, 1);
-  transform-style: preserve-3d;
+.bib-tile-wrapper--animated {
   opacity: 1;
-  scale: 1;
-
-  .bib-leaflet-tile{
+  
+  .bib-leaflet-tile {
     rotate: y 0deg;
   }
-  
-  .bib-leaflet-tile--flipped{
-    rotate: y 180deg;
+
+  .bib-leaflet-tile--flipped {
+    rotate: y -180deg;
   }
-  
-
 }
-
-
