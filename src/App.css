@@ -187,6 +187,10 @@ p {
   position: absolute;
 }
 
+.leaflet-container img.leaflet-tile {
+  image-rendering: var(--rendering);
+}
+
 @keyframes dot-dot-dot {
   0% {
     content: ".";

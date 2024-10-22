@@ -51,7 +51,7 @@ function App({ center }) {
     () => (
       <MapContainer
         center={[0, 0]}
-        zoom={3}
+        zoom={5}
         scrollWheelZoom={true}
         style={{ position: 'absolute', height: '100dvh', width: '100dvw', background: 'white' }}
         crs={CRS.Simple}
@@ -61,10 +61,10 @@ function App({ center }) {
         <TileLayer
           id='tilelayer'
           tileSize={512}
-          maxZoom={5}
+          maxZoom={7}
           // minZoom={1}
           minZoom={Browser.retina ? 0 : 1}
-          maxNativeZoom={Browser.retina ? 3 : 4} //Retina adds + 1 here
+          maxNativeZoom={Browser.retina ? 5 : 6} //Retina adds + 1 here
           // maxNativeZoom={4}
           minNativeZoom={1}
           zoomOffset={0}
@@ -156,6 +156,11 @@ function Logmap({ center }) {
 
     },
     zoomend: (e) => {
+      if (getZoomMultiplier(mapEvents.getZoom()) < 1) {
+        document.documentElement.style.setProperty('--rendering', 'pixelated');
+      } else {
+        document.documentElement.style.setProperty('--rendering', 'optimizeQuality');
+      }
       console.log(mapEvents.getZoom(), getZoomMultiplier(mapEvents.getZoom()), Browser.retina )
     }
   })
