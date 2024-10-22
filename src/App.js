@@ -1,6 +1,5 @@
-import logo from './logo.svg';
 import './App.css';
-import { getZoomMultiplier, newPositioningData, tileInView } from './helper/positioningData'
+import { getZoomMultiplier, tileInView } from './helper/positioningData'
 import { Overlay } from './components/overlay';
 import { useState, useMemo, useEffect } from 'react';
 import { MapContainer } from 'react-leaflet/MapContainer'
@@ -52,9 +51,9 @@ function App({ center }) {
     () => (
       <MapContainer
         center={[0, 0]}
-        zoom={3}
-        scrollWheelZoom={false}
-        style={{ position: 'absolute', height: '100vh', width: '100vw', background:'white' }}
+        zoom={5}
+        scrollWheelZoom={true}
+        style={{ position: 'absolute', height: '100dvh', width: '100dvw', background: 'white' }}
         crs={CRS.Simple}
         ref={setMap}
         attributionControl={false}
@@ -62,10 +61,10 @@ function App({ center }) {
         <TileLayer
           id='tilelayer'
           tileSize={512}
-          maxZoom={5}
+          maxZoom={7}
           // minZoom={1}
           minZoom={Browser.retina ? 0 : 1}
-          maxNativeZoom={Browser.retina ? 3 : 4} //Retina adds + 1 here
+          maxNativeZoom={Browser.retina ? 5 : 6} //Retina adds + 1 here
           // maxNativeZoom={4}
           minNativeZoom={1}
           zoomOffset={0}
@@ -78,7 +77,7 @@ function App({ center }) {
         <Logmap center={center}></Logmap>
       </MapContainer>
     ),
-    [],
+    [center],
   )
   useEffect(() => {
     const stompClient = new Client({
@@ -98,14 +97,18 @@ function App({ center }) {
     });
     stompClient.activate();
 
-    fetch("https://bib.bohenek.xyz/api/session", {credentials: "include"})
-      .then( e => e.json())
-      .then( e => setUsername(e.username))
-      .catch(e=>e);
-
-      // magick, this fixes all retina display issues for the animation
-      const scaling = Browser.retina ? 0.5 : 1;
-      document.documentElement.style.setProperty('--scaling', scaling);
+    fetch("https://bib.bohenek.xyz/api/session")
+      .then(e => {
+        if (e.ok) {
+          e.json().then(e => setUsername(e.username));
+        } else {
+          setUsername("");
+        }
+      })
+      .catch(e => e);
+    // magick, this fixes all retina display issues for the animation
+    const scaling = Browser.retina ? 0.5 : 1;
+    document.documentElement.style.setProperty('--scaling', scaling);
 
     return () => stompClient.deactivate();
   }, [map])
@@ -148,15 +151,20 @@ function Logmap({ center }) {
       mapCenter.y = Math.floor(mapCenter.y);
       if (!stateObj) {
         const state = { state: "objected" };
-        window.history.pushState(state, '', `${window.location.origin}/#${mapCenter.x},${mapCenter.y}`);
+        window.history.pushState(state, '', `${window.location.origin}/?${mapCenter.x},${mapCenter.y}`);
         setStateObj(state);
 
       } else {
-        window.history.replaceState(stateObj, '', `${window.location.origin}/#${mapCenter.x},${mapCenter.y}`);
+        window.history.replaceState(stateObj, '', `${window.location.origin}/?${mapCenter.x},${mapCenter.y}`);
       }
 
     },
     zoomend: (e) => {
+      if (getZoomMultiplier(mapEvents.getZoom()) < 1) {
+        document.documentElement.style.setProperty('--rendering', 'pixelated');
+      } else {
+        document.documentElement.style.setProperty('--rendering', 'optimizeQuality');
+      }
       console.log(mapEvents.getZoom(), getZoomMultiplier(mapEvents.getZoom()), Browser.retina )
     }
   })
