@@ -180,7 +180,7 @@ function Logmap({ center }) {
           // after a random interval add the aninmation
           setTimeout(() => {
             wrapper.classList.add("bib-tile-wrapper--animated");
-          }, Math.random() * 1500 + 100);
+          }, Math.random() * 1000 + 100);
         }
       };
 
@@ -221,7 +221,7 @@ function Logmap({ center }) {
           setTimeout(() => {
             wrapper.classList.add("bib-tile-wrapper--animated");
 
-          }, Math.random() * 400 + 100);
+          }, Math.random() * 700 + 100);
         });
 
         // this brings everything back to the state that leaflet wants it in
@@ -245,7 +245,6 @@ function Logmap({ center }) {
 
       // the solution would be to just keep a map of all the tiles and their corresponding wrapper, this would solve this
       const handleCleanupWrapper = function (event) {
-        const tile = event.tile;
         // Find all tile wrappers in the DOM
         const wrappers = layer._level.el.querySelectorAll(".bib-tile-wrapper");
 
@@ -258,6 +257,11 @@ function Logmap({ center }) {
           }
         });
       }
+
+      if (sessionStorage.getItem('anim')) {
+        return () => {}
+      }
+      sessionStorage.setItem('anim', true)
 
       layer.on("tileload", onTileLoad);
       layer.on('tileloadstart', onTileLoadStart);
