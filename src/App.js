@@ -51,7 +51,7 @@ function App({ center }) {
     () => (
       <MapContainer
         center={[0, 0]}
-        zoom={5}
+        zoom={sessionStorage.getItem('zoom') ?? 5}
         scrollWheelZoom={true}
         style={{ position: 'absolute', height: '100dvh', width: '100dvw', background: 'white' }}
         crs={CRS.Simple}
@@ -140,8 +140,9 @@ function App({ center }) {
 }
 
 function Logmap({ center }) {
-  const [stateObj, setStateObj] = useState();
   const [firstLoad, setFirstLoad] = useState();
+  const [lastState, setLastState] = useState(0);
+
   const mapEvents = useMapEvents({
     moveend: (e) => {
       var mapCenter = mapEvents.latLngToLayerPoint(mapEvents.getCenter())
@@ -149,15 +150,16 @@ function Logmap({ center }) {
         .multiplyBy(getZoomMultiplier(mapEvents.getZoom()));
       mapCenter.x = Math.floor(mapCenter.x);
       mapCenter.y = Math.floor(mapCenter.y);
-      if (!stateObj) {
-        const state = { state: "objected" };
+
+      const state = {c: mapEvents.getCenter(), z: mapEvents.getZoom()};
+      if (window.history.state === null || !state.c.equals(window.history.state.c, 0.1)) {
+        if (Date.now() > lastState + 3000) {
         window.history.pushState(state, '', `${window.location.origin}/?${mapCenter.x},${mapCenter.y}`);
-        setStateObj(state);
-
       } else {
-        window.history.replaceState(stateObj, '', `${window.location.origin}/?${mapCenter.x},${mapCenter.y}`);
+          window.history.replaceState(state, '', `${window.location.origin}/?${mapCenter.x},${mapCenter.y}`);
+        }
+        setLastState(Date.now());
       }
-
     },
     zoomend: (e) => {
       if (getZoomMultiplier(mapEvents.getZoom()) < 1) {
@@ -165,11 +167,25 @@ function Logmap({ center }) {
       } else {
         document.documentElement.style.setProperty('--rendering', 'optimizeQuality');
       }
-      console.log(mapEvents.getZoom(), getZoomMultiplier(mapEvents.getZoom()), Browser.retina )
+      console.log(mapEvents.getZoom(), getZoomMultiplier(mapEvents.getZoom()), Browser.retina );
+      sessionStorage.setItem('zoom', mapEvents.getZoom());
     }
   })
 
   useEffect(() => {
+    const zoomMultiplier = getZoomMultiplier(mapEvents.getZoom());
+    const onPopstate = (e) => {
+      if (e.state !== null) {
+        mapEvents.setView(e.state.c, e.state.z, {animate: false})
+      } else {
+        const state = {c: mapEvents.getCenter(), z: mapEvents.getZoom()};
+        window.history.replaceState(state, '', `${window.location.origin}/?${center[0]},${center[1]}`);
+        mapEvents.setView(mapEvents.layerPointToLatLng(new Point(center[0], center[1]).divideBy(zoomMultiplier).subtract(mapEvents.getPixelOrigin())), mapEvents.getZoom(), {animate: false});
+      }
+      setLastState(0);
+    };
+    window.addEventListener('popstate', onPopstate);
+    
     mapEvents.eachLayer((layer) => {
 
       const onTileLoad = function (event) {
@@ -276,21 +292,17 @@ function Logmap({ center }) {
         layer.off('tileabort', handleCleanupWrapper);
         layer.off('tileerror', handleCleanupWrapper);
       });
-
+    });
 
       return () => {
-        layer.off("tileload");
-        layer.off('tileloadstart', onTileLoadStart);
-        layer.off('tileabort', handleCleanupWrapper);
-        layer.off('tileerror', handleCleanupWrapper);
+      window.removeEventListener('popstate', onPopstate);
       };
-    });
-  }, [mapEvents]);
+  }, [mapEvents, center]);
 
   if (!firstLoad) {
     const zoomMultiplier = getZoomMultiplier(mapEvents.getZoom());
     // console.log(center, new Point(center.x, center.y).subtract(mapEvents.getPixelOrigin()));
-    mapEvents.setView(mapEvents.layerPointToLatLng(new Point(center[0], center[1]).divideBy(zoomMultiplier).subtract(mapEvents.getPixelOrigin())));
+    mapEvents.setView(mapEvents.layerPointToLatLng(new Point(center[0], center[1]).divideBy(zoomMultiplier).subtract(mapEvents.getPixelOrigin())), mapEvents.getZoom(), {animate: false});
     setFirstLoad(true);
     console.log("new map ", mapEvents);
   }
