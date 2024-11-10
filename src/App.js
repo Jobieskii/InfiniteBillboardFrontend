@@ -154,8 +154,8 @@ function Logmap({ center }) {
       const state = {c: mapEvents.getCenter(), z: mapEvents.getZoom()};
       if (window.history.state === null || !state.c.equals(window.history.state.c, 0.1)) {
         if (Date.now() > lastState + 3000) {
-        window.history.pushState(state, '', `${window.location.origin}/?${mapCenter.x},${mapCenter.y}`);
-      } else {
+          window.history.pushState(state, '', `${window.location.origin}/?${mapCenter.x},${mapCenter.y}`);
+        } else {
           window.history.replaceState(state, '', `${window.location.origin}/?${mapCenter.x},${mapCenter.y}`);
         }
         setLastState(Date.now());
@@ -294,9 +294,9 @@ function Logmap({ center }) {
       });
     });
 
-      return () => {
+    return () => {
       window.removeEventListener('popstate', onPopstate);
-      };
+    };
   }, [mapEvents, center]);
 
   if (!firstLoad) {

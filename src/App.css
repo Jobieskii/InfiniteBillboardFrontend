@@ -189,7 +189,7 @@ p {
 
 .leaflet-container img.leaflet-tile {
   image-rendering: var(--rendering);
-  mix-blend-mode: normal;
+  /* mix-blend-mode: normal; */
 }
 
 @keyframes dot-dot-dot {

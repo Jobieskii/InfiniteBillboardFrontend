@@ -7,11 +7,11 @@ export function Overlay({ map, imageObjectUrl, imgSize, scale, onSetScale, onSet
     const imageElement = useRef(null);
 
     useEffect(() => {
-    const onMove = () => {
-        if (clientRect) {
-            calculateAnchor(clientRect, map, onSetOffset);
+        const onMove = () => {
+            if (clientRect) {
+                calculateAnchor(clientRect, map, onSetOffset);
+            }
         }
-    }
 
         map.on('move', onMove)
             .on('moveend', onMove);
@@ -23,14 +23,14 @@ export function Overlay({ map, imageObjectUrl, imgSize, scale, onSetScale, onSet
     }, [map, clientRect, onSetOffset]);
 
     useEffect(() => {
-    const onResize = () => {
-        if (imageElement.current) {
-            const cr = imageElement.current.getBoundingClientRect();
-            setClientRect(cr);
-            calculateAnchor(cr, map, onSetOffset);
+        const onResize = () => {
+            if (imageElement.current) {
+                const cr = imageElement.current.getBoundingClientRect();
+                setClientRect(cr);
+                calculateAnchor(cr, map, onSetOffset);
+            }
         }
-    }
-    
+
         window.addEventListener('resize', onResize);
         return () => {
             window.removeEventListener('resize', onResize);
@@ -76,7 +76,7 @@ export function Overlay({ map, imageObjectUrl, imgSize, scale, onSetScale, onSet
             onTransitionEnd={imgResize}
             alt='user provided'
             ref={imageElement}
-            style={imgSize ? { width: imgSize.width * scale } : {}}
+            style={imgSize ? { width: imgSize.width * scale } : { width: '50vw'}}
         ></img>
     </div>
 
