@@ -5,10 +5,10 @@ export function PlacementBar({ x, y, scale, zoomMultiplier, onSetScale }) {
     const [displayScale, setDisplayScale] = useState((scale * zoomMultiplier).toFixed(3));
     const [editingScale, setEditingScale] = useState(false);
 
-    const [keepScale, setKeepScale] = useState(parseFloat(localStorage.getItem('scale')));
+    const [keepScale, setKeepScale] = useState(parseFloat(sessionStorage.getItem('scale')));
 
     useEffect(() => {
-        localStorage.setItem('scale', keepScale);
+        sessionStorage.setItem('scale', keepScale);
         if (!!keepScale && scale !== keepScale / zoomMultiplier) {
             onSetScale(keepScale / zoomMultiplier);
         }

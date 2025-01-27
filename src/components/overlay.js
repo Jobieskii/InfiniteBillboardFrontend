@@ -1,4 +1,4 @@
-import { useCallback, useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { getZoomMultiplier } from '../helper/positioningData'
 
 export function Overlay({ map, imageObjectUrl, imgSize, scale, onSetScale, onSetOffset, onSetImgSize }) {
@@ -6,40 +6,36 @@ export function Overlay({ map, imageObjectUrl, imgSize, scale, onSetScale, onSet
     const zoomMultiplier = getZoomMultiplier(map.getZoom());
     const imageElement = useRef(null);
 
-    const onMove = () => {
-        if (clientRect) {
-            calculateAnchor(clientRect, map, onSetOffset);
-        }
-    }
-
-    const onResize = () => {
-        if (imageElement.current) {
-            const cr = imageElement.current.getBoundingClientRect();
-            setClientRect(cr);
-            calculateAnchor(cr, map, onSetOffset);
-        }
-    }
-    
-
     useEffect(() => {
-        map.on('move', onMove);
-    
+        const onMove = () => {
+            if (clientRect) {
+                calculateAnchor(clientRect, map, onSetOffset);
+            }
+        }
+
+        map.on('move', onMove)
+            .on('moveend', onMove);
+
         return () => {
-          map.off('move', onMove)
-    
+            map.off('move', onMove)
+                .off('moveend', onMove);
         }
-      }, [map, onMove]);
+    }, [map, clientRect, onSetOffset]);
 
     useEffect(() => {
+        const onResize = () => {
+            if (imageElement.current) {
+                const cr = imageElement.current.getBoundingClientRect();
+                setClientRect(cr);
+                calculateAnchor(cr, map, onSetOffset);
+            }
+        }
+
         window.addEventListener('resize', onResize);
         return () => {
             window.removeEventListener('resize', onResize);
         }
-    }, [])
-
-    
-
-
+    }, [map, onSetOffset])
 
     const imglog = (e) => {
         onSetImgSize({ width: e.target.naturalWidth, height: e.target.naturalHeight });
@@ -65,7 +61,7 @@ export function Overlay({ map, imageObjectUrl, imgSize, scale, onSetScale, onSet
         style = { borderColor: 'rgba(249, 67, 67, 0.67)' };
     } else if (scale * zoomMultiplier < 1) {
         style = { borderColor: 'rgba(255, 206, 58, 0.67)' };
-    } else if (scale * zoomMultiplier == 1) {
+    } else if (scale * zoomMultiplier === 1) {
         style = { borderColor: 'rgba(129, 227, 30, 0.67)' }
     } else {
         style = { borderColor: 'rgba(255, 206, 58, 0.67)' }
@@ -78,8 +74,9 @@ export function Overlay({ map, imageObjectUrl, imgSize, scale, onSetScale, onSet
             className="overlay-image"
             onLoad={imglog}
             onTransitionEnd={imgResize}
+            alt='user provided'
             ref={imageElement}
-            style={ imgSize ? { width: imgSize.width * scale } : {}}
+            style={imgSize ? { width: imgSize.width * scale } : { width: '50vw'}}
         ></img>
     </div>
 
