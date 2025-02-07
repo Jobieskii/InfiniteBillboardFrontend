@@ -138,7 +138,9 @@ function App({ center }) {
           url="https://bib.bohenek.xyz/content/{z}/{x}/{y}.png?{buster}"
           buster={cacheBustIndex}
           detectRetina={true}
-          eventHandlers={{
+          eventHandlers={
+            !sessionStorage.getItem("animPlayed")
+              ? {
             tileloadstart: onTileLoadStart,
             tileload: onTileLoad,
             tileabort: handleCleanupWrapper,
@@ -149,8 +151,11 @@ function App({ center }) {
               layer.off("tileloadstart");
               layer.off("tileabort");
               layer.off("tileerror");
+                    sessionStorage.setItem("animPlayed", true);
             },
-          }}
+                }
+              : {}
+          }
         />
         <AttributionControl position="bottomleft" />
         <Logmap center={center}></Logmap>
@@ -264,13 +269,6 @@ function Logmap({ center }) {
       setLastState(0);
     };
     window.addEventListener('popstate', onPopstate);
-    
-    mapEvents.eachLayer((layer) => {
-        if (sessionStorage.getItem("anim")) {
-          return () => {};
-      }
-        sessionStorage.setItem("anim", true);
-    });
 
     return () => {
       window.removeEventListener('popstate', onPopstate);
