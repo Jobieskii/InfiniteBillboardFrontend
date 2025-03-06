@@ -210,7 +210,7 @@ p {
 .bib-tile-wrapper {
   perspective: 300rem;
   transform-style: preserve-3d;
-  
+  position: absolute;
   .bib-leaflet-tile, 
   .bib-leaflet-tile--flipped {
     width: calc(512px * var(--scaling)) !important;
@@ -225,6 +225,7 @@ p {
   .bib-leaflet-tile--flipped {
     rotate: y 0deg;
     visibility: visible;
+    display: block;
   }
 }
 
